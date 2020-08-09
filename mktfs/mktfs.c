@@ -3,6 +3,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "../tfs.h"
+
 int main(int argc, char **argv) {
 	char *izime = strdup("out.bin");
 	uint64_t vel = 0;
@@ -21,7 +23,7 @@ int main(int argc, char **argv) {
 
 				case 's':
 					if (++i < argc) {
-						vel = atoll(argv[i]) * 1024 * 1024;
+						vel = atoll(argv[i]) * 1024;
 					}
 					else
 						fprintf(stderr, "No size provided.\n"), exit(1);
@@ -38,8 +40,21 @@ int main(int argc, char **argv) {
 	printf("vel   = %lu B\n", vel);
 
 	FILE *iz = fopen(izime, "wb+");
-	
-	char tst[] = "Hello Test World";
-	fwrite(tst, sizeof(char), strlen(tst), iz);
+
+	uint64_t tren_blok = 0;
+
+	blok temp = {0};
+
+	struct tfs_superblock *super = (void*)temp;
+	super->magija = MAGIJA;
+	super->nblokova = vel/VEL_BLOKA;
+	super->ninode = 1;
+	tren_blok++;
+
+
+
+	fwrite(super, VEL_BLOKA, 1, iz);
+
+
 	fclose(iz);
 }
